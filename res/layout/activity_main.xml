@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#b97a57">
+    
+	<LinearLayout android:id="@+id/layout_label"
+    	android:orientation="vertical"
+    	android:layout_width="fill_parent"
+    	android:layout_height="fill_parent">
+
+        <LinearLayout
+        	android:orientation="horizontal"
+    	    android:layout_width="fill_parent"
+    	    android:layout_height="fill_parent">
+    	  
+            <Button android:id="@+id/new_game_btn"
+                android:layout_margin="0dp"
+                android:padding="0dp"
+                android:paddingLeft="0dp"
+   				android:paddingRight="0dp"
+                android:layout_weight="33"
+                android:textStyle="bold"
+                android:textColor="#ffffff"
+                android:layout_width="0dp"
+                android:background="@drawable/menu_button"
+       	 		android:layout_height="wrap_content"
+        		android:onClick="newGame" 
+        		android:text="@string/new_game" />
+          <Button android:id="@+id/rules_btn"
+                android:padding="0dp"
+                android:paddingLeft="0dp"
+   				android:paddingRight="0dp"
+   				android:textColor="#ffffff"
+                android:layout_margin="0dp"
+                android:textStyle="bold"
+                android:background="@drawable/menu_button"
+                android:layout_width="0dp"
+                android:layout_weight="33"
+       	 		android:layout_height="wrap_content"
+        		android:onClick="gameRules" 
+        		android:text="@string/game_rules" />
+          <Button android:id="@+id/exit_btn"
+                android:padding="0dp"
+                android:paddingLeft="0dp"
+   				android:paddingRight="0dp"
+   				android:textColor="#ffffff"
+   				android:background="@drawable/menu_button"
+                android:layout_margin="0dp"
+                android:textStyle="bold"
+                android:layout_width="0dp"
+                android:layout_weight="34"
+       	 		android:layout_height="wrap_content"
+        		android:onClick="exitGame" 
+        		android:text="@string/exit_game" />
+        </LinearLayout>
+      
+        <TextView android:id="@+id/winner_view"
+        	android:layout_width="wrap_content"
+    		android:textStyle="bold"
+    		android:gravity="center"
+    		android:layout_height="40dp" />
+     
+    
+        <TextView android:id="@+id/theWord"
+    		android:layout_width="wrap_content"
+    		android:layout_height="wrap_content"
+    		android:textColor="#ffffff"
+    		android:textSize="50sp"
+    		android:textStyle="bold"
+    		android:layout_gravity="center" />
+      
+        <TextView android:id="@+id/pressKey"
+        	android:layout_width="fill_parent"
+        	android:textStyle="bold"
+    		android:gravity="center"
+        	android:text="@string/pressKey"
+    		android:layout_height="40dp" />
+          
+        <LinearLayout 
+        	android:orientation="horizontal"
+          	android:layout_gravity="center" 
+    	  	android:layout_width="match_parent"
+    	  	android:gravity="center_horizontal"
+    	    android:layout_height="wrap_content">
+        
+      	    <RelativeLayout android:id="@+id/gra_layout"
+       	 		android:layout_width="match_parent"
+       	 		android:gravity="center_horizontal"
+       	 		android:layout_centerHorizontal="true"
+       	 		android:layout_centerInParent="true"
+       	 		android:layout_gravity="center" 
+    	 		android:layout_height="wrap_content"
+    	 		android:paddingLeft="16dp"
+    	 		android:paddingRight="16dp" >
+     	    </RelativeLayout>
+        </LinearLayout>
+      
+        <TextView 
+        	android:layout_width="fill_parent"
+    		android:layout_height="40dp" />
+            
+    	<TextView android:id="@+id/text_message"
+        	android:layout_width="wrap_content"
+    		android:layout_height="wrap_content"
+    		android:textColor="#ffffff"
+    		android:textSize="20sp"
+    		android:textStyle="bold"
+    		android:layout_gravity="center" />
+    </LinearLayout>
+</ScrollView>

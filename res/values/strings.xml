@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Guess The Word</string>
+    <string name="new_game">New Game</string>
+    <string name="exit_game">Exit</string>
+    <string name="game_rules">Rules</string>
+    <string name="game_over">Game is over</string>
+    <string name="pressKey">Press any key:</string>
+    <string name="title_activity_main">MainActivity</string>
+	<string name="title_activity_display_message">My Message</string>
+	<string name="action_settings">Settings</string>
+</resources>
