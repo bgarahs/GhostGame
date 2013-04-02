@@ -20,7 +20,7 @@ public class FileReader{
    * list to hold words starting with different symbols from 'a' to 'z') and adds 
    * words to these lists. Then adds these 25 lists to a new list and returns it. 
    */
-  public static ArrayList<ArrayList<String>> readFile(Context context, TextView tview){
+  public static ArrayList<ArrayList<String>> readFile(Context context){
     ArrayList<ArrayList<String>> list = null;
     try{
       AssetManager am = context.getAssets();

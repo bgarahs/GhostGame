@@ -1,10 +1,17 @@
 package com.example.first;
 import java.util.ArrayList;
+
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Display;
@@ -26,16 +33,25 @@ public class MainActivity extends Activity{
 	private TextView press_key_view;  // text view to show 'press any key'
 	private TextView text_message_view; // view to show hint words
 	private TextView text_word_view;  // view to show getWord()
+	private TextView last_symbol_view; 
+	private ProgressDialog progressDialog; // show while loading a game 
+	private int numberOfWins; // user number of wictories
+	private int numberOfLoses; // number of user's loses
 	
 	// initializing everything
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+       
+        new LoadViewTask().execute();    // progress dialog while loading the game
+        setContentView(R.layout.activity_main); // sets content view for main activity
         
+        numberOfWins=0;
+        numberOfLoses=0;
         press_key_view = (TextView) findViewById(R.id.pressKey);
         text_message_view = (TextView) findViewById(R.id.text_message);
         text_word_view = (TextView) findViewById(R.id.theWord);
+        last_symbol_view = (TextView) findViewById(R.id.last_symbol);
         
         // for smaller displays, set only landscape orientation
         Display display = getWindowManager().getDefaultDisplay();
@@ -43,7 +59,6 @@ public class MainActivity extends Activity{
         	this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         
         addKeyBoard(); // adds keyboard for the game
-        createGame(); // reads the dictionary and creates a game
     }
 
     /**
@@ -51,11 +66,36 @@ public class MainActivity extends Activity{
      * @ensure game != null
      */
     private void createGame(){
-        words = readFile();
-        if(words == null)
-        	text_message_view.setText("Error reading file");
-        else
-            game = new GhostGame(words); // creates game
+    //	final Handler handler = new Handler();
+    //	handler.postDelayed(new Runnable() {
+    //	  @Override
+    //	  public void run() { 
+   // 		  words = readFile();
+   /// 		  Intent i = new Intent(MainActivity.this.getApplicationContext(), ReadinFileActivity.class);
+   // 		  startActivityForResult(i, 10);
+  ///  	  }
+   // 	}, 0);
+        //words = readFile();
+      //  if(words == null)
+      //  	text_message_view.setText("Error reading file");
+      //  else
+    	//words = readFile();
+          //  game = new GhostGame(words); // creates game
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    //  if (resultCode == RESULT_OK && requestCode == 10) {
+    	  
+    //    if (data !=null && data.hasExtra("returnedData")) {
+        	//words = data.getParcelableExtra("returnedData");
+        	//words = ((FileReaderSerializable)data.getSerializableExtra("returnedData")).getList();
+        	//data.getExtras().getString("returnedData");
+        	
+        	//this.words = data.getExtras().
+         // Toast.makeText(this, data.getExtras().getString("returnKey1"),
+         //     Toast.LENGTH_SHORT).show();
+     //   }
+    //  }
     }
     
     /**
@@ -64,9 +104,9 @@ public class MainActivity extends Activity{
      * 'a' to 'z'
      */
     private ArrayList<ArrayList<String>> readFile(){
-    	text_message_view.setText("Reading data");
-    	ArrayList<ArrayList<String>> list = FileReader.readFile(getApplicationContext(),text_message_view);
-    	text_message_view.setText("");
+    	//text_message_view.setText("Reading data");
+    	ArrayList<ArrayList<String>> list = FileReader.readFile(getApplicationContext());
+    	//text_message_view.setText("");
     	return list;
     }
     
@@ -77,11 +117,18 @@ public class MainActivity extends Activity{
     public void newGame(View view){
     	Button btn = (Button) findViewById(R.id.new_game_btn);
     	btn.setBackgroundResource(R.drawable.menu_button_clicked);
+    	setUpGUI();
+    	changeButtonBackground(btn, R.drawable.menu_button, 100);
+    }
+    
+    /**
+     * Clears all GUI for a new game
+     */
+    private void setUpGUI(){
     	game = new GhostGame(words);
     	press_key_view.setText("Press any key:");
     	text_message_view.setText("");
     	text_word_view.setText("");
-    	changeButtonBackground(btn, R.drawable.menu_button, 100);
     }
      
     /**
@@ -284,26 +331,197 @@ public class MainActivity extends Activity{
      * @require symbol.length() == 1
      * @ensure
      */
-    private void sendMessage(String symbol) {
-        assert(symbol.length()==1);
+    private void sendMessage(String userSymbol) {
+        assert(userSymbol.length()==1);
+        String currWord = game.getWord();
+        String compSymbol="";
     	if(game != null && !game.isGameOver()){
-    		game.acceptUserLetter(symbol);
+    		game.acceptUserLetter(userSymbol);
+    		compSymbol = game.getWord().charAt(game.getWord().length()-1)+"";
+    		
     		if(game.isGameOver()){
     			text_message_view.setTextSize(20);
     		   	press_key_view.setText("Winner: "+game.getWinner().toString());
     			performGameOver();
     		}
-    		else if(hintOn)
-    			showHint();
+    		else if(hintOn){
+    			showHint(); 
+    		}
     	}
     	else
-    		press_key_view.setText("Winner: "+game.getWinner());	
-        text_word_view.setText(game.getWord());
+    		press_key_view.setText("Winner: "+game.getWinner());
+    	
+    	text_word_view.setText(game.getWord());
+    	//odun(userSymbol, currWord);
+    	//showSymbols(userSymbol+"", compSymbol,currWord); // show what user nad comp chose
+    }
+    
+    private void odun(String userSymbol1,String currWord){
+    	int delay=500;
+    	final String userSymbol = userSymbol1;
+    	final String currentWord= currWord;
+    	
+    	// chekau
+    	final Handler handlerx = new Handler();
+        handlerx.postDelayed(new Runnable() {
+        	  @Override
+        	  public void run() { // nothin but delay here
+        		  String fff= game.getWord();
+        	  }
+       	}, delay);
+    	
+        // kladu usersymbol
+        text_word_view.setText(currentWord);
+        final Handler handlerx1 = new Handler();
+        handlerx1.postDelayed(new Runnable() {
+        	  @Override
+        	  public void run() { // nothin but delay here
+        		  
+        	      last_symbol_view.setText(userSymbol);
+        	  }
+       	}, delay);
+        
+     // chekau
+    	final Handler handlerwx = new Handler();
+        handlerwx.postDelayed(new Runnable() {
+        	  @Override
+        	  public void run() { // nothin but delay here
+        		  String fff= game.getWord();
+        	  }
+       	}, delay);
+    	
+    	// kladu ves text
+        text_word_view.setText(currentWord+userSymbol);
+    	final Handler handlerxy = new Handler();
+        handlerxy.postDelayed(new Runnable() {
+        	  @Override
+        	  public void run() { // nothin but delay here
+        		  
+        	      last_symbol_view.setText("");
+        	  }
+       	}, delay);
+        
+        
+    	
+    }
+    
+    /**
+     * 
+     * @param userSymbol
+     * @param compSymbol
+     */
+    private void showSymbols(String userSmbl, String compSymbol, String currWord ){
+    	int delay=500;
+    	
+    	final String userSymbol = userSmbl;
+    	final String currentWord= currWord;
+    	text_word_view.setText(currWord);
+    	last_symbol_view.setText(userSymbol);
+    	
+    	
+    	final Handler handlerxy = new Handler();
+        handlerxy.postDelayed(new Runnable() {
+        	  @Override
+        	  public void run() { // nothin but delay here
+        	  }
+       	}, delay);
+        
+        
+    	final String sym = new String(userSymbol);
+    	final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+        	  @Override
+        	  public void run() { 
+        		  last_symbol_view.setText("");
+        		  text_word_view.setText(currentWord+userSymbol);
+        		  
+        	  }
+       	}, delay);
+        
+        
+        final Handler handlerx = new Handler();
+        handlerx.postDelayed(new Runnable() {
+        	  @Override
+        	  public void run() { // nothin but delay here
+        	  }
+       	}, delay);
+        
+        final String sym2 = compSymbol;
+        last_symbol_view.setText(sym2+"");
+    	final Handler handler2 = new Handler();
+        handler.postDelayed(new Runnable() {
+        	  @Override
+        	  public void run() { 
+        		  last_symbol_view.setText("");
+        		  text_word_view.setText(game.getWord());
+        		  
+        	  }
+       	}, delay);
+    }
+    
+    /**
+     * Plays game lost music
+     */
+    private void playGameLostMusic(){
+    	MediaPlayer mp = new MediaPlayer();
+    	mp = MediaPlayer.create(this,R.raw.game_lost_sound);
+    	mp.start();
+    }
+    
+    /**
+     * Plays game won music
+     */
+    private void playGameWonMusic(){
+    	MediaPlayer mp = new MediaPlayer();
+    	mp = MediaPlayer.create(this,R.raw.game_won_sound);
+    	mp.start();
     }
     		
     // does something when game is over
+    /**
+     * 
+     */
     private void performGameOver(){
-    	text_message_view.setText("");
+    	String title;
+    	if(game.getWinner()==GhostGame.Winner.USER){
+    		numberOfWins++;
+    		title = "Great! You won";
+    		playGameWonMusic();
+    	}
+    	else {
+    		numberOfLoses++;
+    		title = "Unfortunately, you lost";
+    		playGameLostMusic();
+    	}
+    	
+    		
+    	final Context context = this;
+    	AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+		// set title
+		alertDialogBuilder.setTitle(title);
+		// set dialog message
+		alertDialogBuilder
+		.setMessage("Current word: "+game.getWord()+
+				"\nYou won "+numberOfWins+" time(s) and lost "+numberOfLoses+" time(s)")
+		.setCancelable(false)
+		.setPositiveButton("Exit",new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog,int id) {
+				MainActivity.this.finish();
+			}
+		  })
+		.setNegativeButton("New Game",new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog,int id) {
+				dialog.cancel();
+				game = new GhostGame(words);
+				setUpGUI();
+			}
+		});
+		
+		// create alert dialog
+		AlertDialog alertDialog = alertDialogBuilder.create();
+		// show it
+		alertDialog.show();
+		setUpGUI();
     }
     
     // gets possible words for user to use for game - hint for user
@@ -384,4 +602,56 @@ public class MainActivity extends Activity{
           
       }
     }
+    
+    
+  /////////////////////////////////////////////////////////////////////////////////  
+    // dialog while game is loading
+    private class LoadViewTask extends AsyncTask<Void, Integer, Void>  
+    {  
+        //Before running code in a separate thread  
+        @Override  
+        protected void onPreExecute()  
+        {  
+            //Create a new progress dialog  
+            progressDialog = ProgressDialog.show(MainActivity.this,"Loading...",  
+            	    "Loading the game, please wait...", false, false);  
+        }  
+  
+        //The code to be executed in a background thread.  
+        @Override  
+        protected Void doInBackground(Void... params)  
+        {  
+            try  
+            {  
+                synchronized (this)  
+                {
+                	words = readFile(); // reads dictionary
+                    game = new GhostGame(words); // creates game
+                	
+                    while(game==null)
+                        this.wait(50);   
+                }  
+            }  
+            catch (InterruptedException e){  
+                e.printStackTrace();  
+            }  
+            return null;  
+        }  
+  
+        //Update the progress  
+        @Override  
+        protected void onProgressUpdate(Integer... values)  
+        {  
+            //set the current progress of the progress dialog  
+            progressDialog.setProgress(values[0]);  
+        }  
+  
+        //after executing the code in the thread  
+        @Override  
+        protected void onPostExecute(Void result)  
+        {  
+            //close the progress dialog  
+            progressDialog.dismiss();   
+        }  
+    }  
 }
